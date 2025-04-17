@@ -28,7 +28,7 @@ class Product(models.Model):
     slug = models.SlugField()
     image = models.ImageField(upload_to="product_img", blank=True, null=True)
     category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, blank=True, null=True
+        Category, on_delete=models.SET_NULL, related_name="products", blank=True, null=True
     )
 
     def __str__(self):
