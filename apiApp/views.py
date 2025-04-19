@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Category, Product
 from .serializers import (
+    CategoryDetailSerializer,
     CategoryListSerializer,
     ProductDetailSerializer,
     ProductListSerializer,
@@ -31,3 +32,13 @@ def category_list(request):
     categories = Category.objects.all()
     serializer = CategoryListSerializer(categories, many=True)
     return Response(serializer.data)
+
+
+@api_view(["GET"])
+def category_detail(request, slug):
+    try:
+        category = Category.objects.get(slug=slug)
+        serializer = CategoryDetailSerializer(category)
+        return Response(serializer.data)
+    except Category.DoesNotExist:
+        return Response({"error": "❌ Category not found!"})
