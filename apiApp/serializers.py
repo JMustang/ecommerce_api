@@ -52,5 +52,18 @@ class CartSerializer(serializers.ModelSerializer):
 
     def get_cart_total(self, cart):
         items = cart.cartitems.all()
-        total = sum([items.quantity * item.product.price for item in items])
+        total = sum([item.quantity * item.product.price for item in items])
+        return total
+
+
+class CartStartSerializer(serializers.ModelSerializer):
+    total_quantity = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cart
+        fields = ["id", "cart_code", "total_quantity"]
+
+    def get_total_quantity(self, cart):
+        items = cart.cartitems.all()
+        total = sum([item.quantity for item in items])
         return total
