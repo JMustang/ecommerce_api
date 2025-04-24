@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Category, Product
+from .models import Cart, CartItem, Category, Product
 from .serializers import (
+    CartSerializer,
     CategoryDetailSerializer,
     CategoryListSerializer,
     ProductDetailSerializer,
@@ -42,3 +43,19 @@ def category_detail(request, slug):
         return Response(serializer.data)
     except Category.DoesNotExist:
         return Response({"error": "❌ Category not found!"})
+
+
+@api_view(["POST"])
+def add_to_cart(request):
+    cart_code = request.data.get("cart_code")
+    product_id = request.data.get("product_id")
+
+    cart, created = Cart.objects.get_or_create(cart_code=cart_code)
+    product = Product.objects.get(id=product_id)
+
+    cartitem, created = CartItem.objects.get_create(product=product, cart=cart)
+    cartitem.quantity = 1
+    cartitem.save()
+
+    serializer = CartSerializer(cart)
+    return Response(serializer.data)
