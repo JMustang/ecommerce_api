@@ -66,6 +66,7 @@ def add_to_cart(request):
 def update_cartitem_quantity(request):
     cartitem_id = request.data.get("item_id")
     quantity = request.data.get("quantity")
+    quantity = int(quantity)
 
     try:
         cartitem = CartItem.objects.get(id=cartitem_id)
