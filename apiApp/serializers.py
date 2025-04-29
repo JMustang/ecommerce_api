@@ -67,3 +67,11 @@ class CartStartSerializer(serializers.ModelSerializer):
         items = cart.cartitems.all()
         total = sum([item.quantity for item in items])
         return total
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Review
+        fields = ["id", "user", "rating", "review", "created", "updated"]
