@@ -1,7 +1,8 @@
 from django.shortcuts import render
+from django.contrib.auth import get_user_model
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Cart, CartItem, Category, Product
+from .models import Cart, CartItem, Category, Product, Review
 from .serializers import (
     CartItemSerializer,
     CartSerializer,
@@ -9,7 +10,10 @@ from .serializers import (
     CategoryListSerializer,
     ProductDetailSerializer,
     ProductListSerializer,
+    ReviewSerializer,
 )
+
+User = get_user_model()
 
 
 @api_view(["GET"])
@@ -79,3 +83,26 @@ def update_cartitem_quantity(request):
         )
     except CartItem.DoesNotExist:
         return Response({"error": "❌ Cart item not found!"})
+
+
+@api_view(["POST"])
+def add_review(request):
+
+    product_id = request.data.get("product_id")
+    email = request.data.get("email")
+    rating = request.data.get("rating")
+    review_text = request.data.get("review")
+
+    product = Product.objects.get(id=product_id)
+    user = User.objects.get(email=email)
+
+    if Review.objects.filter(product=product, user=user).exists():
+        return Response(
+            {"error": "❌ You already dropped a review for this product"}, status=400
+        )
+
+    review = Review.objects.create(
+        product=product, user=user, rating=rating, review=review_text
+    )
+    serializer = ReviewSerializer(review)
+    return Response(serializer.data)
