@@ -12,4 +12,5 @@ urlpatterns = [
         views.update_cartitem_quantity,
         name="update_cartitem_quantity",
     ),
+    path("add_review/", views.add_review, name="add_review"),
 ]
