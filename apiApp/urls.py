@@ -13,4 +13,5 @@ urlpatterns = [
         name="update_cartitem_quantity",
     ),
     path("add_review/", views.add_review, name="add_review"),
+    path("update_review/<int:pk>/", views.update_review, name="update_review"),
 ]
