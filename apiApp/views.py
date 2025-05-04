@@ -79,7 +79,7 @@ def update_cartitem_quantity(request):
 
         serializer = CartItemSerializer(cartitem)
         return Response(
-            {"data": serializer.data, "message": "Cart item updated successfully!"}
+            {"data": serializer.data, "message": "✅ Cart item updated successfully!"}
         )
     except CartItem.DoesNotExist:
         return Response({"error": "❌ Cart item not found!"})
@@ -106,3 +106,22 @@ def add_review(request):
     )
     serializer = ReviewSerializer(review)
     return Response(serializer.data)
+
+
+@api_view(["PUT"])
+def update_review(request, pk):
+    try:
+        review = Review.objects.get(id=pk)
+        rating = request.data.get("rating")
+        review_text = request.data.get("review")
+
+        review.rating = rating
+        review.review = review_text
+        review.save()
+
+        serializer = ReviewSerializer(review)
+        return Response(
+            {"data": serializer.data, "message": "✅ Review updated successfully!"}
+        )
+    except Review.DoesNotExist:
+        return Response({"error": "❌ Review not found!"})
