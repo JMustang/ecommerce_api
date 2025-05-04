@@ -30,7 +30,7 @@ def product_detail(request, slug):
         serializer = ProductDetailSerializer(product)
         return Response(serializer.data)
     except Product.DoesNotExist:
-        return Response({"error": "❌ Product not found!"})
+        return Response({"error": "❌ Product not found!"}, status=404)
 
 
 @api_view(["GET"])
@@ -47,7 +47,7 @@ def category_detail(request, slug):
         serializer = CategoryDetailSerializer(category)
         return Response(serializer.data)
     except Category.DoesNotExist:
-        return Response({"error": "❌ Category not found!"})
+        return Response({"error": "❌ Category not found!"}, status=404)
 
 
 @api_view(["POST"])
@@ -79,10 +79,11 @@ def update_cartitem_quantity(request):
 
         serializer = CartItemSerializer(cartitem)
         return Response(
-            {"data": serializer.data, "message": "✅ Cart item updated successfully!"}
+            {"data": serializer.data, "message": "✅ Cart item updated successfully!"},
+            status=200,
         )
     except CartItem.DoesNotExist:
-        return Response({"error": "❌ Cart item not found!"})
+        return Response({"error": "❌ Cart item not found!"}, status=404)
 
 
 @api_view(["POST"])
@@ -121,7 +122,18 @@ def update_review(request, pk):
 
         serializer = ReviewSerializer(review)
         return Response(
-            {"data": serializer.data, "message": "✅ Review updated successfully!"}
+            {"data": serializer.data, "message": "✅ Review updated successfully!"},
+            status=200,
         )
     except Review.DoesNotExist:
-        return Response({"error": "❌ Review not found!"})
+        return Response({"error": "❌ Review not found!"}, status=404)
+
+
+@api_view(["DELETE"])
+def delete_review(request, pk):
+    try:
+        review = Review.objects.get(id=pk)
+        review.delete()
+        return Response({"message": "✅ Review deleted successfully!"}, status=204)
+    except Review.DoesNotExist:
+        return Response({"error": "❌ Review not found!"}, status=404)
