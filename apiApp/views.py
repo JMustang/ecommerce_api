@@ -79,7 +79,10 @@ def update_cartitem_quantity(request):
 
         serializer = CartItemSerializer(cartitem)
         return Response(
-            {"data": serializer.data, "message": "✅ Cart item updated successfully!"},
+            {
+                "message": "✅ Cart item updated successfully!",
+                "data": serializer.data,
+            },
             status=200,
         )
     except CartItem.DoesNotExist:
@@ -122,7 +125,10 @@ def update_review(request, pk):
 
         serializer = ReviewSerializer(review)
         return Response(
-            {"data": serializer.data, "message": "✅ Review updated successfully!"},
+            {
+                "message": "✅ Review updated successfully!",
+                "data": serializer.data,
+            },
             status=200,
         )
     except Review.DoesNotExist:
