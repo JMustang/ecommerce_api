@@ -146,6 +146,16 @@ def delete_review(request, pk):
         return Response({"error": "❌ Review not found!"}, status=404)
 
 
+@api_view(["DELETE"])
+def delete_cartitem(request, pk):
+    try:
+        cartitem = CartItem.objects.get(id=pk)
+        cartitem.delete()
+        return Response({"message": "✅ Cart item deleted successfully!"}, status=204)
+    except CartItem.DoesNotExist:
+        return Response({"error": "❌ Item not found!"}, status=404)
+
+
 @api_view(["POST"])
 def add_to_wishlist(request):
     product_id = request.data.get("product_id")
