@@ -5,7 +5,16 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Cart, CartItem, Category, Product, Review, Wishlist
+from .models import (
+    Cart,
+    CartItem,
+    Category,
+    Order,
+    OrderItem,
+    Product,
+    Review,
+    Wishlist,
+)
 from .serializers import (
     CartItemSerializer,
     CartSerializer,
@@ -266,3 +275,26 @@ def my_webhook_view(request):
         fulfill_checkout(session, cart_code)
 
     return HttpResponse(status=200)
+
+
+def fulfill_checkout(session, cart_code):
+
+    order = Order.objects.create(
+        stripe_checkout_id=session["id"],
+        amount=session["amount_total"],
+        currency=session["currency"],
+        customer_email=session["customer_email"],
+        status="Paid",
+    )
+
+    print(session)
+
+    cart = Cart.objects.get(cart_code=cart_code)
+    cartitems = cart.cartitems.all()
+
+    for item in cartitems:
+        orderitem = OrderItem.objects.create(
+            order=order, product=item.product, quantity=item.quantity
+        )
+
+    cart.delete()
