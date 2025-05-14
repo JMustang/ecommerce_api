@@ -138,3 +138,12 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.stripe_checkout_id} - {self.status}"
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+
+    def __str__(self):
+        return f"Order {self.product.name} - {self.order.stripe_checkout_id}"
