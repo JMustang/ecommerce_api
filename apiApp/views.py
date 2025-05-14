@@ -17,8 +17,13 @@ from .serializers import (
     WishlistSerializer,
 )
 
+
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
 # Create your views here.
 stripe.api_key = settings.STRIPE_SECRET_KEY
+endpoint_secret = settings.WEBHOOK_SECRET
 
 User = get_user_model()
 
@@ -234,3 +239,30 @@ def create_checkout_session(request):
         return Response({"data": checkout_session})
     except Exception as e:
         return Response({"error": str(e)}, status=400)
+
+
+@csrf_exempt
+def my_webhook_view(request):
+    payload = request.body
+    sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
+    event = None
+
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
+    except ValueError as e:
+        # Invalid payload
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        return HttpResponse(status=400)
+
+    if (
+        event["type"] == "checkout.session.completed"
+        or event["type"] == "checkout.session.async_payment_succeeded"
+    ):
+        session = event["data"]["object"]
+        cart_code = session.get("metadata", {}).get("cart_code")
+
+        fulfill_checkout(session, cart_code)
+
+    return HttpResponse(status=200)
